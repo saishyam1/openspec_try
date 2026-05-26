@@ -81,6 +81,19 @@ def landing_page() -> HTMLResponse:
     )
 
 
+@app.get("/stats")
+def stats() -> dict:
+    """Quick summary counts across all reports."""
+    from app.data import all_reports as _all
+    rows = _all()
+    counts: dict[str, int] = {}
+    for r in rows:
+        counts[r.status] = counts.get(r.status, 0) + 1
+    total_amount = round(sum(r.amount for r in rows), 2)
+    avg_vibe = round(sum(r.rating_for_vibecoding for r in rows) / len(rows), 2)
+    return {"total": len(rows), "by_status": counts, "total_amount": total_amount, "avg_vibe_rating": avg_vibe}
+
+
 @app.get("/reports", response_model=ReportListResponse)
 def list_reports(
     status: ReportStatus | None = Query(None, description="Filter by status"),
