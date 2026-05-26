@@ -57,6 +57,7 @@ def landing_page() -> HTMLResponse:
                     <ul>
                         <li><a href='/health'><code>GET /health</code></a> — liveness probe</li>
                         <li><a href='/reports'><code>GET /reports</code></a> — paginated reports list</li>
+                        <li><a href='/stats'><code>GET /stats</code></a> — quick counts by status + avg vibe rating</li>
                         <li><a href='/docs'><code>GET /docs</code></a> — auto-generated Swagger UI</li>
                     </ul>
                 </section>
