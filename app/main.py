@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse
 
 from app.converter import convert, supported_currencies
+from app.history import record, recent
 from app.models import ConversionResult, CurrencyInfo
 
 app = FastAPI(title="Currency Converter API", version="1.0.0")
@@ -82,6 +83,7 @@ def convert_currency(
     fc = from_currency.upper()
     tc = to_currency.upper()
     rate = round(result / amount, 6)
+    record(fc, tc, amount, result, rate)
     return ConversionResult(
         from_currency=fc,
         to_currency=tc,
@@ -89,3 +91,9 @@ def convert_currency(
         converted=result,
         rate=rate,
     )
+
+
+@app.get("/history")
+def conversion_history(limit: int = Query(10, ge=1, le=50)) -> list[dict]:
+    """Return the last N conversions made this session."""
+    return [entry._asdict() for entry in recent(limit)]
