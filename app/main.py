@@ -97,3 +97,14 @@ def convert_currency(
 def conversion_history(limit: int = Query(10, ge=1, le=50)) -> list[dict]:
     """Return the last N conversions made this session."""
     return [entry._asdict() for entry in recent(limit)]
+
+
+@app.get("/popular")
+def popular_pairs() -> list[dict]:
+    """Return the top 5 most-used currency pairs from this session's history."""
+    counts: dict[str, int] = {}
+    for entry in recent(50):
+        key = f"{entry.from_currency}→{entry.to_currency}"
+        counts[key] = counts.get(key, 0) + 1
+    sorted_pairs = sorted(counts.items(), key=lambda x: x[1], reverse=True)[:5]
+    return [{"pair": pair, "count": count} for pair, count in sorted_pairs]
